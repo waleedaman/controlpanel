@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QUdpSocket>
+
 
 namespace Ui {
 class MainWindow;
@@ -19,13 +21,20 @@ public:
 //    int getSpeed();
 //    int getHeight();
 private slots:
-    void sayHello();
     void updateSpeed();
     void updateHeight();
+    void moveUp();
+    void moveDown();
+    void stop();
+    void go();
 private:
     Ui::MainWindow *ui;
     int speed;
     int height;
+    QString sendUdpPacket(QString);
+    QUdpSocket *udpSocketSend,*udpSocketSend1;
+    QHostAddress *bcastA1,*bcastA2;
+
 };
 
 #endif // MAINWINDOW_H
