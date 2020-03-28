@@ -27,6 +27,8 @@ private slots:
     void moveDown();
     void stop();
     void go();
+    void changeStatus();
+    void changeStatus1();
 private:
     Ui::MainWindow *ui;
     int speed;

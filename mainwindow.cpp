@@ -14,9 +14,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->height->setMaximum(30);
     ui->height->setSingleStep(1);
     ui->height->setPageStep(1);
+    ui->stop->setStyleSheet("background-color: red");
 
     ui->currentSpeed->setText("0");
     ui->currentHeight->setText("0 cm");
+
+
+    ui->c_height->setAlignment(Qt::AlignCenter);
+    ui->c_height_2->setAlignment(Qt::AlignCenter);
+    ui->c_height_3->setAlignment(Qt::AlignCenter);
+    ui->c_height_4->setAlignment(Qt::AlignCenter);
+    ui->c_height_5->setAlignment(Qt::AlignCenter);
+    ui->c_height_6->setAlignment(Qt::AlignCenter);
+
 
     connect(ui->speed,SIGNAL(valueChanged(int)),this,SLOT(updateSpeed()));
     connect(ui->height,SIGNAL(valueChanged(int)),this,SLOT(updateHeight()));
@@ -25,14 +35,20 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->down,SIGNAL(clicked(bool)),this,SLOT(moveDown()));
     connect(ui->stop,SIGNAL(clicked(bool)),this,SLOT(stop()));
     connect(ui->go,SIGNAL(clicked(bool)),this,SLOT(go()));
-
-
+    QPixmap pixmap("assets/stop-icon.png");
+    QIcon ButtonIcon(pixmap);
+    ui->stop->setIcon(ButtonIcon);
     udpSocketSend = new QUdpSocket(this);
     udpSocketSend1 = new QUdpSocket(this);
-    bcastA1 = new QHostAddress("10,0,0,11");
-    udpSocketSend->connectToHost(*bcastA1,4002);
-    bcastA2 = new QHostAddress("10,0,0,12");
-    udpSocketSend1->connectToHost(*bcastA2,4003);
+    udpSocketSend->bind(4005);
+    bcastA1 = new QHostAddress(QHostAddress::Broadcast);
+//    udpSocketSend->connectToHost(*bcastA1,4002);
+    bcastA2 = new QHostAddress("10,0,0,13");
+//    udpSocketSend1->connectToHost(*bcastA2,4003);
+    connect(udpSocketSend,SIGNAL(connected()),this,SLOT(changeStatus()));
+//    connect(udpSocketSend1,SIGNAL(connected()),this,SLOT(changeStatus1()));
+    QByteArray mess("This is a testqeqwe");
+    udpSocketSend->writeDatagram(mess,QHostAddress::Broadcast,4002);
 }
 
 void MainWindow::updateSpeed(){
@@ -53,25 +69,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::moveUp(){
     QString qs("up;");
-    qs+=ui->speed->value();
+    qs+=QString::number(ui->speed->value());
     qs+=";";
     this->sendUdpPacket(qs);
 }
 
 void MainWindow::moveDown(){
     QString qs("down;");
-    qs+=ui->speed->value();
+    qs+=QString::number(ui->speed->value());
     qs+=";";
     this->sendUdpPacket(qs);
 }
 
 void MainWindow::go(){
     QString qs("go;");
-    qs+=ui->speed->value();
+    qs+=QString::number(ui->speed->value());
     qs+=";";
-    qs+=ui->height->value();
+    qs+=QString::number(ui->height->value());
     qs+=";";
     this->sendUdpPacket(qs);
+//    ui->->display(ui->height->value());
+//    ui->current_height->setText(QString::number(ui->height->value()));
+    ui->c_height->setValue(ui->height->value());
 }
 
 void MainWindow::stop(){
@@ -81,7 +100,28 @@ void MainWindow::stop(){
 
 QString MainWindow::sendUdpPacket(QString message){
     QByteArray mess = message.toUtf8();
-    udpSocketSend->write(mess);
-    udpSocketSend1->write(mess);
+//    udpSocketSend->write(mess);
+//    udpSocketSend1->write(mess);
+    if(udpSocketSend->writeDatagram(mess,QHostAddress::Broadcast,4002)){
+        ui->status->setText("sent");
+    }else{
+        ui->status->setText("Error");
+    }
+    if(udpSocketSend->writeDatagram(mess,QHostAddress::Broadcast,4002)){
+        ui->status->setText("sent");
+    }else{
+        ui->status->setText("Error");
+    }
+//    udpSocketSend1->writeDatagram(mess,*bcastA2,4003);
     return * new QString("Sent");
+}
+
+void MainWindow::changeStatus(){
+    QString str = ui->status->text();
+    ui->status->setText(str+"connected to port: 4002");
+}
+
+void MainWindow::changeStatus1(){
+    QString str = ui->status->text();
+    ui->status->setText(str+"connected to port: 4003");
 }
