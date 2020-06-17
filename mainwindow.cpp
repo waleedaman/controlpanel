@@ -47,8 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    udpSocketSend1->connectToHost(*bcastA2,4003);
     connect(udpSocketSend,SIGNAL(connected()),this,SLOT(changeStatus()));
 //    connect(udpSocketSend1,SIGNAL(connected()),this,SLOT(changeStatus1()));
-    QByteArray mess("This is a testqeqwe");
-    udpSocketSend->writeDatagram(mess,QHostAddress::Broadcast,4002);
+
 }
 
 void MainWindow::updateSpeed(){
@@ -68,14 +67,14 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::moveUp(){
-    QString qs("up;");
+    QString qs("mu;");
     qs+=QString::number(ui->speed->value());
     qs+=";";
     this->sendUdpPacket(qs);
 }
 
 void MainWindow::moveDown(){
-    QString qs("down;");
+    QString qs("md;");
     qs+=QString::number(ui->speed->value());
     qs+=";";
     this->sendUdpPacket(qs);
@@ -94,7 +93,7 @@ void MainWindow::go(){
 }
 
 void MainWindow::stop(){
-    QString qs("stop;");
+    QString qs("st;");
     this->sendUdpPacket(qs);
 }
 
@@ -112,7 +111,9 @@ QString MainWindow::sendUdpPacket(QString message){
     }else{
         ui->status->setText("Error");
     }
-//    udpSocketSend1->writeDatagram(mess,*bcastA2,4003);
+    udpSocketSend1->writeDatagram(mess,*bcastA2,4001);
+    udpSocketSend1->writeDatagram(mess,*bcastA2,4002);
+    udpSocketSend1->writeDatagram(mess,*bcastA2,4003);
     return * new QString("Sent");
 }
 
