@@ -29,12 +29,15 @@ private slots:
     void go();
     void changeStatus();
     void changeStatus1();
+    void processPendingDatagrams();
+    void onSocketStateChange(QAbstractSocket::SocketState);
+    void balance();
 private:
     Ui::MainWindow *ui;
     int speed;
     int height;
     QString sendUdpPacket(QString);
-    QUdpSocket *udpSocketSend,*udpSocketSend1;
+    QUdpSocket *udpSocketSend,*udpSocketSend1,*udpSocketSend2,*udpSocketRecieve;
     QHostAddress *bcastA1,*bcastA2;
 
 };
