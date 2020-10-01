@@ -110,6 +110,18 @@ void MainWindow::balance(){
     this->sendUdpPacket(qs);
 }
 
+void MainWindow::sendUdpPacket1(QString message,QVarLengthArray<int> ports){
+    QByteArray mess = message.toUtf8();
+    for (int i = 0;i < ports.size() ; i++ ) {
+        ui->status->setText(QString::number(ports[i]));
+        if(udpSocketSend->writeDatagram(mess,QHostAddress::Broadcast,ports[i])){
+            ui->status->setText(ui->status->text() + "Sent to port" + QString::number(ports[i]));
+            udpSocketSend->flush();
+        }else{
+            ui->status->setText(ui->status->text() + "Error port" + QString::number(ports[i]));
+        }
+    }
+}
 
 QString MainWindow::sendUdpPacket(QString message){
     QByteArray mess = message.toUtf8();
@@ -199,15 +211,35 @@ void MainWindow::processPendingDatagrams()
 
              }else if(List.at(0) == "RP"){
                  double roll = 0.0,pitch = 0.0,roll11 = 0.0,pitch11 = 0.0;
+                 QVarLengthArray<int> array(3);
                  if(List.at(1).toInt() == 4010){
                      roll = List.at(2).toDouble();
                      pitch = List.at(3).toDouble();
-                     ui->status->setText(ui->status->text() + "Act 1 Roll:" + QString::number(roll) + " Pitch:" + QString::number(pitch));
+                     ui->roll->setText(QString::number(roll));
+                     ui->pitch->setText(QString::number(pitch));
                  }
                  if(List.at(1).toInt() == 4011){
                      roll11 = List.at(2).toDouble();
                      pitch11 = List.at(3).toDouble();
-                     ui->status->setText(ui->status->text() + "Act 2 Roll:" + QString::number(roll11) + " Pitch:" + QString::number(pitch11));
+                     ui->roll11->setText(QString::number(roll11));
+                     ui->pitch11->setText(QString::number(pitch11));
+                 }
+                 if(pitch11 > 0.1){
+                     array.clear();
+                     array.insert(0,4001);
+                     this->sendUdpPacket1("bu;255;",array);
+                 }
+                 else if(pitch11 < -0.1){
+                     array.clear();
+                     array.insert(0,4002);
+                     array.insert(1,4003);
+                     this->sendUdpPacket1("bu;255;",array);
+                 }else{
+                     array.clear();
+                     array.insert(0,4001);
+                     array.insert(1,4002);
+                     array.insert(2,4003);
+                     this->sendUdpPacket1("st;",array);
                  }
              }
 

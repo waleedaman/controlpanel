@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QUdpSocket>
-
+#include <QVarLengthArray>
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +37,7 @@ private:
     int speed;
     int height;
     QString sendUdpPacket(QString);
+    void sendUdpPacket1(QString,QVarLengthArray<int>);
     QUdpSocket *udpSocketSend,*udpSocketSend1,*udpSocketSend2,*udpSocketRecieve;
     QHostAddress *bcastA1,*bcastA2;
 
